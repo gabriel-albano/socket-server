@@ -1,0 +1,71 @@
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script>
+  var socket = io.connect('http://localhost:8080');
+
+  // on connection to server, ask for user's name with an anonymous callback
+  socket.on('connect', function () {
+    // call the server-side function 'adduser' and send one parameter (value of prompt)
+    // socket.emit('addclient', "Client-1", "Customer-1");
+    console.log("Connected to web socket server");
+  });
+
+  // listener, whenever the server emits 'updatechat', this updates the chat body
+  socket.on('update', function (sender, data) {
+    console.log(sender + " sent: " + data);
+  });
+
+  socket.on('HELO', function (data) {
+    console.log("Websocket Server sent: " + data);
+  });
+
+  socket.on('rooms', function (data) {
+    console.log(data);
+  });
+
+  socket.on('ping', function(data) {
+    if (data) {
+      console.log(data);
+    }
+  });
+
+  /*
+  socket.on('updateroomusers', function (roomusers) {
+    $("#roomusers").empty();
+    $.each(roomusers, function (key, value) {
+      $('#roomusers').append('<div>' + value + '</div>');
+    });
+  });
+
+  function switchRoom(room) {
+    socket.emit('switchRoom', room);
+  }
+  */
+  // on load of page
+  $(function () {
+    // when the client clicks Conneect
+    $('#connect').click(function () {
+      var group = $('#group').val();
+      var client = $('#client').val();
+      // connect client
+      socket.emit('addclient', client, group);
+    });
+
+    $('#disconnect').click(function () {
+      socket.emit('disco');
+    });
+
+    $('#rooms').click(function () {
+      socket.emit('getRooms');
+    });
+  });
+
+</script>
+
+<div>
+    <input id="group"/>
+    <input id="client">
+    <input type="button" id="connect" value="Connect"/>
+    <input type="button" id="disconnect" value="Disconnect"/>
+    <input type="button" id="rooms" value="Rooms"/>
+</div>
